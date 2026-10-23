@@ -4,6 +4,73 @@
 #include <string>
 #include <iomanip>
 
+//Registers
+uint16_t AF; //lower byte of this register has the flags 7 = Zero Flag, 6 = Substraction Flag, 5 = HC Flag, 4 = Carry Flag
+uint16_t BC;
+uint16_t DE;
+uint16_t HL;
+uint16_t SP;
+uint16_t PC;
+
+uint8_t get_A(){ return (AF & 0xFF00) >> 8; }
+void set_A(uint8_t value){  AF = (value << 8) | (AF & 0x00FF);   }
+
+uint8_t get_B(){ return (BC & 0xFF00) >> 8; }
+void set_B(uint8_t value){  BC = (value << 8) | (BC & 0x00FF);   }
+
+uint8_t get_C(){ return (BC & 0x00FF); }
+void set_C(uint8_t value){ BC = (BC & 0xFF00) | (value); }
+
+uint8_t get_D(){ return (DE & 0xFF00) >> 8; }
+void set_D(uint8_t value){  DE = (value << 8) | (DE & 0x00FF);   }
+
+uint8_t get_E(){ return (DE & 0x00FF); }
+void set_E(uint8_t value){ DE = (DE & 0xFF00) | (value); }
+
+uint8_t get_L(){ return (HL & 0x00FF); }
+void set_L(uint8_t value){ HL = (HL & 0xFF00) | (value); }
+
+uint8_t get_H(){ return (HL & 0xFF00) >> 8; }
+void set_H(uint8_t value){  HL = (value << 8) | (HL & 0x00FF);   }
+
+//Flags
+bool get_Z_flag() { return (AF & (1 << 7)) != 0; }
+void set_Z(bool value) {
+    if (value) {
+        AF |= (1 << 7);
+    } else {
+        AF &= ~(1 << 7);
+    }
+}
+
+bool get_N_flag() { return (AF & (1 << 6)) != 0; }
+void set_N(bool value) {
+    if (value) {
+        AF |= (1 << 6);
+    } else {
+        AF &= ~(1 << 6);
+    }
+}
+
+bool get_H_flag() { return (AF & (1 << 5)) != 0; }
+void set_H(bool value) {
+    if (value) {
+        AF |= (1 << 5);
+    } else {
+        AF &= ~(1 << 5);
+    }
+}
+
+bool get_C_flag() { return (AF & (1 << 4)) != 0; }
+void set_C(bool value) {
+    if (value) {
+        AF |= (1 << 4);
+    } else {
+        AF &= ~(1 << 4);
+    }
+}
+    
+
 int main() {
     // Open the file in binary mode and immediately jump to the end ("ate")
     std::string filename = "pokemon_red.gb";
@@ -45,29 +112,6 @@ int main() {
     << static_cast<int>(rom_buffer[0x0100]) 
     << std::endl;
 
-    //Registers (8 bits)
-    uint8_t A;
-    uint8_t B;
-    uint8_t C;
-    uint8_t D;
-    uint8_t E;
-    uint8_t H;
-    uint8_t L;
-
-    //Registers (16 bits)
-    uint16_t AF; //lower byte of this register has the flags 7 = Zero Flag, 6 = Substraction Flag, 5 = HC Flag, 4 = Carry Flag
-    uint16_t BC;
-    uint16_t DE;
-    uint16_t HL;
-    uint16_t SP;
-    uint16_t PC;
-
-    //Flags
-    uint8_t Z = (AF << 8) >> 15;
-    uint8_t N = (AF << 9) >> 15;
-    uint8_t H = (AF << 10) >> 15;
-    uint8_t C = (AF << 11) >> 15;
-    
     //Instruction execution
     while(true){
         std::cout << "PC is now " << pc << std::endl;
